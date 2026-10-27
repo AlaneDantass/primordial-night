@@ -1,5 +1,5 @@
 package net.poo.primordialnight.item.custom;
-
+import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -7,6 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.poo.primordialnight.procedures.SanctuaryArenaBuilderProcedure;
+
 
 /**
  * Danilo's Idea: The Void Compass ("Eye of Pytu").
@@ -22,6 +24,7 @@ import net.minecraft.world.level.Level;
  * Reference Repository: boss-locator-main (BossCatalog.java / UnlockRequestPacket.java)
  */
 public class EndCompassItem extends Item {
+
 
     public static final BlockPos SANCTUARY_TARGET_POS = new BlockPos(0, 70, 120);
     private static final int COMPASS_COOLDOWN_TICKS = 20;
@@ -39,10 +42,16 @@ public class EndCompassItem extends Item {
         }
 
         // TODO (Dev 4):
-        // 1. Check if level.dimension().equals(Level.END). If not, send a message to the player that the Eye only awakens in The End.
-        // 2. Store or display the direction/coordinates of SANCTUARY_TARGET_POS and spawn a trail of ParticleTypes.PORTAL toward it.
-        // 3. Apply COMPASS_COOLDOWN_TICKS using player.getCooldowns().addCooldown(this, COMPASS_COOLDOWN_TICKS).
+        if (!level.dimension().equals(Level.END)) {
+            player.displayClientMessage(Component.literal("O Olho de Pytũ só desperta no The End!"), true);
+            return InteractionResultHolder.fail(compassStack);
+        }
+        player.displayClientMessage(Component.literal("Santuário de PytÛ em X: %d,Y: %d,Z: %d".formatted(SANCTUARY_TARGET_POS.getX(), SANCTUARY_TARGET_POS.getY(), SANCTUARY_TARGET_POS.getZ())), true);
 
-        return InteractionResultHolder.success(compassStack);
+
+        player.getCooldowns().addCooldown(this, COMPASS_COOLDOWN_TICKS);
+        return InteractionResultHolder.sidedSuccess(compassStack, level.isClientSide());
+
+
     }
 }
