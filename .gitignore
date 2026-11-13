@@ -23,3 +23,8 @@ run
 
 # Files from Forge MDK
 forge*changelog.txt
+
+#my new ignored files and folder
+ReferenceRepositories/
+GUIA_INSTRUCOES_EQUIPE.md
+*.bak
