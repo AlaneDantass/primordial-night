@@ -101,5 +101,5 @@ primordialnight/
 ### Authors & Credits
 
 - **Team:** Alane, Danilo, Arthur, Kalebe
-- **Architectural Reference & Best Practices:** Architectural structure and naming conventions inspired by the repositories of **Rômulo Henri ([@romhenri](https://github.com/romhenri))** (`rise-modpack` and `drg-stock`).
+- **Architectural Reference & Best Practices:** (`rise-modpack` and `drg-stock`).
 - **Technical Modding References:** Kaupenjoe (`Forge-Tutorial-1.20.X`), `Bosses-of-Mass-Destruction-FORGE`, `mirror-abyss`, `silver-samurai-boss`, `Astram_Anvishya_Asuram`, `AlexsMobs`, and `boss-locator`.
