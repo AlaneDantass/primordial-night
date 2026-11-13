@@ -9,13 +9,13 @@ import java.util.Set;
 
 /**
  * Validates and dismantles the T-shaped Ancestral Totem used to awaken Yma-Pytu.
- *
+
  * Team Decision (A3 & Yma-Pytu Creative Sheet Section 2.B):
  * - Vertical Base (2 blocks high: topBlockPos and topBlockPos.below()):
  *   Accepts either Blocks.PURPUR_PILLAR or Blocks.CRYING_OBSIDIAN.
  * - Horizontal Arms (2 blocks on the left/right of topBlockPos along either X-axis or Z-axis):
  *   Requires Blocks.END_STONE_BRICKS.
- *
+
  * Responsible: Dev 4
  * OOP Concepts:
  * - Encapsulation & Single Responsibility Principle (separates structure validation from ModEvents)
@@ -48,9 +48,24 @@ public class TotemStructureValidator {
      */
     public static void dismantleTotemStructure(Level level, BlockPos topCenterPos) {
         // TODO (Dev 4):
+        if (level.isClientSide())
+            return;
+        level.destroyBlock(topCenterPos, false);
+        level.destroyBlock(topCenterPos.below(), false);
+        if (isArmBlock(level, topCenterPos.east())) {
+            level.destroyBlock(topCenterPos.east(), false);
+            level.destroyBlock(topCenterPos.west(), false);
+        }
+        else  {
+            level.destroyBlock(topCenterPos.north(), false);
+            level.destroyBlock(topCenterPos.south(), false);
+        }
+    }
+
+
         // 1. Check whether the arms are aligned on the X-axis (east/west) or Z-axis (north/south).
         // 2. Replace the 2 base blocks and 2 arm blocks with Blocks.AIR using level.destroyBlock(..., false).
-    }
+
 
     private static boolean isBaseBlock(Level level, BlockPos pos) {
         return VALID_TOTEM_BASE_BLOCKS.contains(level.getBlockState(pos).getBlock());
@@ -58,5 +73,5 @@ public class TotemStructureValidator {
 
     private static boolean isArmBlock(Level level, BlockPos pos) {
         return level.getBlockState(pos).is(VALID_TOTEM_ARM_BLOCK);
-    }
-}
+    }}
+
