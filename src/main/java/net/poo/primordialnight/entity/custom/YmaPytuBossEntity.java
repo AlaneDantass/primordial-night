@@ -1,10 +1,12 @@
 package net.poo.primordialnight.entity.custom;
 
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.AnimationState;
@@ -164,24 +166,65 @@ public class YmaPytuBossEntity extends Monster {
         //! roda a cada tick exclusivamente no servidor. Aqui é onde a barra roxa de vida é recalculada
         //! (vida atual dividida pela vida máxima, dando um valor entre 0.0 e 1.0 para preencher a barra).
         super.customServerAiStep();
-        this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth()); 
+        this.bossEvent.setProgress(this.getHealth() / this.getMaxHealth());
 
+        if (this.level() instanceof ServerLevel serverLevel) {//mantem a barreira ativa durante toda batalha
+            this.spawnArenaBoundaryParticles(serverLevel);
+        }
+
+        //!Nesse método ele verifica a transição para o modo fúria
         //método executado 20x por seg, então só entra no if se ele tiver na fase 1.
         if( this.getHealth()<=this.getMaxHealth()*ENRAGED_HEALTH_THRESHOLD_RATIO && this.getBossPhase()== BossPhase.PHASE_ONE){ 
             this.setBossPhase(BossPhase.ENRAGED); //Não precisei enviar os parâmetros, pois como o bossPhase é um enum, ele já tem a fase com os parâmetros definidos.
-            // this.getAttribute
+            this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(BASE_MOVEMENT_SPEED*BossPhase.ENRAGED.getSpeedMultiplier());
         // ! ENCAPSULAMENTO: não é possível ter setHealther pois efeitos temporários(muito usados no minecraft) deixariam a lógica do jogo muito bagunçada
+        //this.getAttribute(Attributes.MOVEMENT_SPEED) retorna uma instância padrão que genrencia a velocidade desse monstro específico
+        //setBaseValue: por padrão o minecraft já tem uma velocidade padrão dele, precisamos chamar o set pra isso
+        //BossPhase.ENRAGED.getSpeedMultiplier() :pega o multiplicador 
 
-        }
+
+        //BossPhase: É uma tabela de consulta.
+        //Attributes.MOVEMENT_SPEED: etiqueta que especidifa o que exatamente ele tá falando no jogo, que é a velocidade de andar
+        //this.getAttribute: É o objeto real na memória daquele monstro específico que
+            //! Efeito de Explosão no modo fúria
+            if (this.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(
+                ParticleTypes.PORTAL, // 1. O tipo da partícula (partículas roxas do portal)
+                this.getX(),          // 2. Coordenada X (onde o Boss está)
+                this.getY() + 1.5,    // 3. Coordenada Y (na altura do peito do Boss)
+                this.getZ(),          // 4. Coordenada Z (onde o Boss está)
+                50,                   // 5. Quantidade de partículas (uma explosão de 50)
+                0.5, 0.5, 0.5,        // 6. Espalhamento (meio bloco para cada lado)
+                0.1                   // 7. Velocidade em que elas voam
+            );
+            }
         
+        }
+    }
 
+    //Aqui estamos definindo o círculo da arena de Luta ao redor do Boss
+    private void spawnArenaBoundaryParticles(ServerLevel serverLevel){
+        //o boss só solt apartículas a cada 10 ticks pra economizar desempenho
+        if(this.tickCount%10!=0){ //tickCount é o contador de vida padrão do jogo
+            return;
+        }
 
-        // TODO (Dev 1):
-        // 1. Check if current health is below 50% (this.getHealth() <= this.getMaxHealth() * ENRAGED_HEALTH_THRESHOLD_RATIO)
-        //    and current phase is BossPhase.PHASE_ONE.
-        // 2. If so, call setBossPhase(BossPhase.ENRAGED), which updates bossEvent.setDarkenScreen(true),
-        //    increases movement speed by +35% (BossPhase.ENRAGED.getSpeedMultiplier()), and spawns violet flame particles.
-        // 3. Maintain the "Horizon of the Night" circular particle barrier around the arena border so neither player nor boss falls into the End void.
+        final double  ARENA_BARRIER_RADIUS = 16.0;
+        final int PARTICLE_COUNT = 24; // Quantos pontos ao redor do círculo
+
+        for(int i = 0; i < PARTICLE_COUNT; i++){
+            double angle = (2 * Math.PI / PARTICLE_COUNT) * i;
+            double offsetX = Math.cos(angle) * ARENA_BARRIER_RADIUS;
+            double offsetZ = Math.sin(angle) * ARENA_BARRIER_RADIUS;
+
+            serverLevel.sendParticles(
+                ParticleTypes.WITCH, // partícula de magia roxa (padrão)
+                this.getX() + offsetX,
+                this.getY() + 0.5,
+            this.getZ() + offsetZ,
+            1, 0.0, 0.0, 0.0, 0.0
+            );
+        }
     }
 
     @Override
@@ -231,3 +274,12 @@ public class YmaPytuBossEntity extends Monster {
         this.bossEvent.setDarkenScreen(newPhase.shouldDarkenSky());
     }
 }
+
+
+//! CHECK LIST:
+/*Barreira da Arena: Você moveu a chamada this.spawnArenaBoundaryParticles(serverLevel) para fora do if, garantindo que ela rode durante toda a luta!
+-Método Auxiliar spawnArenaBoundaryParticles: Cálculo trigonométrico (2𝜋/24) com Math.cos e Math.sin, raio de 16 blocos e proteção de performance com tickCount % 10 != 0.
+-Máquina de Estados e Fúria: Condição estrita checando proporção de vida e BossPhase.PHASE_ONE.
+-Ajuste Dinâmico de Velocidade: Atualização no Attributes.MOVEMENT_SPEED usando o multiplicador encapsulado do Enum.
+-Efeito Visual da Fúria: Disparo das partículas de portal na altura do peito do Boss (𝑌+1.5).
+*/
