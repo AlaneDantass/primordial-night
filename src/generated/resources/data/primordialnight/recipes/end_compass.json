@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "minecraft:compass"
+    },
+    "C": {
+      "item": "minecraft:crying_obsidian"
+    },
+    "E": {
+      "item": "minecraft:ender_pearl"
+    }
+  },
+  "pattern": [
+    "ECE",
+    "CBC",
+    "ECE"
+  ],
+  "result": {
+    "item": "primordialnight:end_compass"
+  },
+  "show_notification": true
+}
