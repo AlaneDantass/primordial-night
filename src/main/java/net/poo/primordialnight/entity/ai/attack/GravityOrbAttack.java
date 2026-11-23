@@ -1,6 +1,10 @@
 package net.poo.primordialnight.entity.ai.attack;
 
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.poo.primordialnight.entity.ModEntities;
+import net.poo.primordialnight.entity.custom.GravityOrbProjectileEntity;
 import net.poo.primordialnight.entity.custom.YmaPytuBossEntity;
 import net.poo.primordialnight.entity.enums.BossPhase;
 
@@ -29,9 +33,33 @@ public class GravityOrbAttack extends AbstractBossAttack {
 
     @Override
     protected void executeAttack(YmaPytuBossEntity boss, LivingEntity target) {
-        // TODO (Dev 2):
-        // 1. Calculate direction vector (dx, dy, dz) from boss eye position to target center.
-        // 2. Instantiate GravityOrbProjectileEntity using ModEntities.GRAVITY_ORB_PROJECTILE.get().
-        // 3. Spawn the projectile in boss.level().addFreshEntity(orb) and play an Enderman/Beacon sound.
+        // ── 1. Calcular vetor de direção do olho do boss ao centro do alvo ────────
+        // getEyeY() = altura dos olhos do boss (ponto de disparo)
+        // target.getY() + target.getBbHeight() / 2.0 = centro vertical do alvo
+        double dx = target.getX()  - boss.getX();
+        double dy = (target.getY() + target.getBbHeight() / 2.0) - boss.getEyeY();
+        double dz = target.getZ()  - boss.getZ();
+
+        // ── 2. Instanciar o projétil apontando na direção calculada ───────────────
+        // O construtor posiciona o orbe na altura dos olhos do boss
+        // e usa (dx, dy, dz) como vetor de movimento inicial
+        GravityOrbProjectileEntity orb = new GravityOrbProjectileEntity(
+                ModEntities.GRAVITY_ORB_PROJECTILE.get(),
+                boss, dx, dy, dz,
+                boss.level()
+        );
+
+        // ── 3. Spawnar no mundo e tocar som de disparo ────────────────────────────
+        boss.level().addFreshEntity(orb);
+
+        // Som de disparo: Enderman teleport (temático ao vazio), pitch grave
+        boss.level().playSound(
+                null,
+                boss.getX(), boss.getEyeY(), boss.getZ(),
+                SoundEvents.ENDERMAN_TELEPORT,
+                SoundSource.HOSTILE,
+                1.0F,
+                0.5F
+        );
     }
 }
