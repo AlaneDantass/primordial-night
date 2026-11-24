@@ -49,11 +49,11 @@ public class VoidbladeSwordItem extends SwordItem {
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (!target.level().isClientSide()) {
-            if (!target.level().isClientSide()){
+
                 target.addEffect(new MobEffectInstance(MobEffects.DARKNESS, DARKNESS_DURATION_TICKS));
                 target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION_TICKS));
             }
-        }
+        
         return super.hurtEnemy(stack, target, attacker);
     }
 

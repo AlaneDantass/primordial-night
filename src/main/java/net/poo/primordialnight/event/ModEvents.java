@@ -1,7 +1,10 @@
 package net.poo.primordialnight.event;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -10,21 +13,12 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.poo.primordialnight.PrimordialNightMod;
+import net.poo.primordialnight.entity.ModEntities;
+import net.poo.primordialnight.entity.custom.YmaPytuBossEntity;
 import net.poo.primordialnight.procedures.SanctuaryArenaBuilderProcedure;
 import net.poo.primordialnight.procedures.TotemStructureValidator;
 
-/**
- * Listens to Forge game events on the main Forge Event Bus.
- * Implements the Team's Totem + Ender Dragon Egg Summoning Ritual.
- *
- * Responsible: Dev 4
- * OOP Concepts: Event-Driven Architecture (@SubscribeEvent), delegation to TotemStructureValidator
- * and SanctuaryArenaBuilderProcedure.
- *
- * Reference:
- * - Yma-Pytu, A Primeira Noite.pdf (Section 2.B)
- * - GUIA_BOAS_PRATICAS_ROMHENRI.md (Section 6.4 & Section 7 #6 Dimension check)
- */
+
 @Mod.EventBusSubscriber(modid = PrimordialNightMod.MOD_ID)
 public class ModEvents {
 
@@ -62,10 +56,14 @@ public class ModEvents {
             // 3. Build the circular Sanctuary of the First Night arena around the ritual site
             SanctuaryArenaBuilderProcedure.buildCircularSanctuaryArena(serverLevel, clickedPos.below());
 
-            // TODO (Dev 4):
-            // 4. Instantiate YmaPytuBossEntity via ModEntities.YMA_PYTU_BOSS.get().create(serverLevel),
-            //    move it to clickedPos.below(), spawn purple portal particles and thunder sound,
-            //    and call serverLevel.addFreshEntity(bossEntity).
+            YmaPytuBossEntity bossEntity = ModEntities.YMA_PYTU_BOSS.get().create(serverLevel);
+            if (bossEntity != null) {
+                BlockPos spawnPos = clickedPos.below();
+                bossEntity.moveTo(spawnPos.getX() + 0.5, spawnPos.getY() + 1.0, spawnPos.getZ() + 0.5, 0.0F, 0.0F);
+                serverLevel.sendParticles(ParticleTypes.PORTAL, spawnPos.getX() + 0.5, spawnPos.getY() + 1.5, spawnPos.getZ() + 0.5, 40, 1.0, 1.0, 1.0, 0.2);
+                serverLevel.playSound(null, spawnPos, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.HOSTILE, 2.0F, 0.8F);
+                serverLevel.addFreshEntity(bossEntity);
+            }
         }
     }
 }

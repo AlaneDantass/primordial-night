@@ -21,7 +21,6 @@ public class SanctuaryArenaBuilderProcedure {
     public static final int BORDER_WALL_HEIGHT = 3;
 
     public static void buildCircularSanctuaryArena(ServerLevel serverLevel, BlockPos centerPos) {
-        // TODO (Dev 4):
         for (int x = -ARENA_RADIUS; x <= ARENA_RADIUS; x++) {
             for (int z = -ARENA_RADIUS; z <= ARENA_RADIUS; z++) {
                 int distSq = x * x + z * z;
@@ -33,7 +32,7 @@ public class SanctuaryArenaBuilderProcedure {
                     }
                     if (distSq > (ARENA_RADIUS - 1) * (ARENA_RADIUS - 1)) {
                         for (int y = 1; y <= BORDER_WALL_HEIGHT; y++) {
-                            serverLevel.setBlock(floorPos.above(y), Blocks.NETHER_BRICK_FENCE.defaultBlockState(), 3);
+                            serverLevel.setBlock(floorPos.above(y), Blocks.CRYING_OBSIDIAN.defaultBlockState(),3);
                         }
                     }
                 }

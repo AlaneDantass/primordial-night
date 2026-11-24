@@ -41,12 +41,12 @@ public class EndCompassItem extends Item {
             return InteractionResultHolder.pass(compassStack);
         }
 
-        // TODO (Dev 4):
+
         if (!level.dimension().equals(Level.END)) {
             player.displayClientMessage(Component.literal("O Olho de Pytũ só desperta no The End!"), true);
             return InteractionResultHolder.fail(compassStack);
         }
-        player.displayClientMessage(Component.literal("Santuário de PytÛ em X: %d,Y: %d,Z: %d".formatted(SANCTUARY_TARGET_POS.getX(), SANCTUARY_TARGET_POS.getY(), SANCTUARY_TARGET_POS.getZ())), true);
+        player.displayClientMessage(Component.literal("Santuário de Pytũ em X: %d,Y: %d,Z: %d".formatted(SANCTUARY_TARGET_POS.getX(), SANCTUARY_TARGET_POS.getY(), SANCTUARY_TARGET_POS.getZ())), true);
 
 
         player.getCooldowns().addCooldown(this, COMPASS_COOLDOWN_TICKS);
