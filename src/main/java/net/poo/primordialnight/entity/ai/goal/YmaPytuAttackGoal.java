@@ -41,14 +41,35 @@ public class YmaPytuAttackGoal extends MeleeAttackGoal {
     @Override
     public void tick() {
         super.tick();
+
+        // Decrementa o cooldown global de ataques especiais a cada tick
         if (this.specialAttackCooldownTicks > 0) {
             --this.specialAttackCooldownTicks;
         }
 
         LivingEntity target = this.bossEntity.getTarget();
+
+        // Só tenta usar um ataque especial se há alvo e o cooldown já zerou
         if (target != null && this.specialAttackCooldownTicks <= 0) {
-            // TODO (Dev 2): Select an eligible BossAttackAction from attackStrategies where canUseAttack() is true,
-            // call performAttack(bossEntity, target), and set specialAttackCooldownTicks to the returned cooldown.
+
+            // ── Strategy Pattern: iterar sobre as estratégias de ataque ───────────
+            // Percorre a lista em ordem (VoidSlamAttack tem prioridade sobre GravityOrbAttack).
+            // O primeiro ataque elegível (canUseAttack() == true) é executado.
+            for (BossAttackAction strategy : this.attackStrategies) {
+                if (strategy.canUseAttack(this.bossEntity, target)) {
+
+                    // Polimorfismo: performAttack() chama o executeAttack() correto
+                    // de cada subclasse (VoidSlamAttack ou GravityOrbAttack).
+                    // Retorna o cooldown em ticks daquele ataque específico.
+                    this.specialAttackCooldownTicks = strategy.performAttack(this.bossEntity, target);
+
+                    // Ativa a animação de ataque visível no cliente
+                    this.bossEntity.setAttacking(true);
+
+                    // Para na primeira estratégia elegível — apenas um ataque por ciclo
+                    break;
+                }
+            }
         }
     }
 
