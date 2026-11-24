@@ -20,13 +20,7 @@ import net.poo.primordialnight.item.ModItems;
 import net.poo.primordialnight.sound.ModSounds;
 import org.slf4j.Logger;
 
-/**
- * Main orchestrator class of the mod (Romulo Henri Best Practice #1:
- * The main class ONLY orchestrates registrations and contains no game logic).
- *
- * Reference Repository: Forge-Tutorial-1.20.X-29-attackAnimation (TutorialMod.java)
- *                       and rise-modpack (BurneriteMod.java / RubyOreMod.java)
- */
+
 @Mod(PrimordialNightMod.MOD_ID)
 public class PrimordialNightMod {
 
@@ -52,7 +46,7 @@ public class PrimordialNightMod {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        // TODO (Dev 4): Add ModItems (VOIDBLADE_SWORD, END_COMPASS, YMA_PYTU_SPAWN_EGG) to creative tabs
+
     }
 
     @SubscribeEvent
