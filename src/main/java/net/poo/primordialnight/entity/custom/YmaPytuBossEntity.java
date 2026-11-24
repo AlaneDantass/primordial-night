@@ -283,3 +283,10 @@ public class YmaPytuBossEntity extends Monster {
 -Ajuste Dinâmico de Velocidade: Atualização no Attributes.MOVEMENT_SPEED usando o multiplicador encapsulado do Enum.
 -Efeito Visual da Fúria: Disparo das partículas de portal na altura do peito do Boss (𝑌+1.5).
 */
+
+//! Vamos usar, entãoo Graceful Degradation e tolerância a Falhas
+/*
+Vamos criar uma excessão personalizada que herda de Exception, se usássemos o RuntimeException teríamos que tratar a falha imediatamente, gerando um crash no jogo
+por isso vamos criar um bloco try catch se o fromId lançar uma exceção, segura o erro no ar antes que ele derrube o jogo, registra a falha, continua no PHASE_ONE para a luta continuar
+*/
+
